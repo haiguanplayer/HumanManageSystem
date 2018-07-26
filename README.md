@@ -1,5 +1,6 @@
 # HumanManageSystem
 一个由SSM（Spring+SpringMVC+MyBatis）框架整合而成的Web项目
+
 四个模块
 
 * 组织结构管理
