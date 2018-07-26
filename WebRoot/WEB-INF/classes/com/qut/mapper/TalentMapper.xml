@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qut.mapper.TalentMapper">
+	<select id="Talent_findAllTalent" resultType="com.qut.pojo.Talent">
+		select * from talent
+	</select>
+	
+	<select id="Talent_findBytalent" parameterType="Integer"
+		resultType="com.qut.pojo.Talent"
+	>
+		select * from talent where p_id = #{p_id}
+	</select>
+	
+	<delete id="Talent_deleteBytalent" parameterType="Integer">
+		delete from talent where p_id = #{p_id}
+	</delete>
+	
+	<insert id="Talent_insert" parameterType="com.qut.pojo.Talent">
+		insert into talent values(#{p_id}, #{p_name}, #{gender}, 
+			#{birth}, #{id_card}, #{score}, #{edu}, #{tel})
+	</insert>
+</mapper>

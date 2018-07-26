@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qut.mapper.TempEmpMapper">
+	
+	<select id="Temp_findTemp" 
+		resultType="com.qut.pojo.TempEmp"
+	>
+		select distinct * from temp_emp ,emp where emp.p_id=temp_emp.p_id and emp.work_state = '临时工'
+
+	</select>
+	
+	<update id="Temp_updateTime" parameterType="com.qut.pojo.TempEmp">
+		update temp_emp set try_time = #{try_time} where p_id = #{p_id}
+	</update>
+	
+	<select id="Temp_findById" parameterType="Integer"
+	resultType="com.qut.pojo.TempEmp">
+		select * from temp_emp where p_id = #{p_id}
+	</select>
+	
+	<update id="Temp_updateQm" parameterType="com.qut.pojo.TempEmp">
+		UPDATE temp_emp set qiman_time = (SELECT DATE_ADD(date(temp_emp.entry_date),INTERVAL temp_emp.try_time DAY))
+	</update>
+
+	<update id="Temp_updateToZs" parameterType="com.qut.pojo.TempEmp">
+		update emp set work_date=date(now()),work_state = '正式工' where p_id = #{p_id}
+	</update>
+	
+	<select id="Temp_findByNow" resultType="com.qut.pojo.TempEmp">
+		select DISTINCT t.p_id,t.p_name,t.entry_date,t.try_time,t.qiman_time from temp_emp t,emp  
+			where qiman_time &lt;= date(now()) and emp.work_state = '临时工' and t.p_id = emp.p_id
+	</select>
+	
+
+</mapper>

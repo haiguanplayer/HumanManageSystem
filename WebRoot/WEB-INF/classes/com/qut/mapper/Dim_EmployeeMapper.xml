@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.qut.mapper.Dim_EmployeeMapper">
+	
+	 <select id="findEmployeeById" parameterType="com.qut.pojo.Staff"
+		resultType="com.qut.pojo.Staff"
+	> 
+		select * from emp where p_id=#{p_id} 
+	</select> 
+	
+	<select id="findEmployeeByDept" parameterType="com.qut.pojo.Staff"
+		resultType="com.qut.pojo.Staff"
+	> 
+		select * from emp where dept_name=#{dept_name} 
+	</select> 
+	<select id="findEmployeeByName" parameterType="com.qut.pojo.Staff"
+		resultType="com.qut.pojo.Staff"
+	> 
+		select * from emp where p_name=#{p_name} 
+	</select> 
+	<select id="findDiEmpByName" parameterType="com.qut.pojo.dimission"
+		resultType="com.qut.pojo.dimission"
+	> 
+		select * from dimission where p_name=#{p_name} 
+	</select> 
+	<select id="findDiEmpByDept" parameterType="com.qut.pojo.dimission"
+		resultType="com.qut.pojo.dimission"
+	> 
+		select * from dimission where dept_name=#{dept_name} 
+	</select> 
+	
+	<select id="findDiEmpByPost" parameterType="com.qut.pojo.dimission"
+		resultType="com.qut.pojo.dimission"
+	> 
+		select * from dimission where post_name=#{post_name} 
+	</select>
+	
+	<select id="findDiEmpByLeaveclass" parameterType="com.qut.pojo.dimission"
+		resultType="com.qut.pojo.dimission"
+	> 
+		select * from dimission where leave_class=#{leave_class} 
+	</select>
+	<select id="findDiEmpByDate" parameterType="com.qut.pojo.dimission"
+		resultType="com.qut.pojo.dimission"
+	> 
+		select * from dimission where entry_date &gt;= #{entry_date} and leave_date &lt;= #{leave_date}
+	</select>
+	
+   <insert id="insertEmployee"  parameterType="com.qut.pojo.dimission">
+		insert into dimission
+			value(#{p_id},#{p_name},#{id_card},#{gender},#{birth},#{edu},#{dept_name},#{post_name},#{entry_date},#{work_date},#{score},#{leave_date},#{leave_class},#{leave_direction},#{whether},#{remarks},#{tel})
+		
+	</insert>
+
+	
+	
+	<select id="findDiEmployee" parameterType="com.qut.pojo.dimission"
+		resultType="com.qut.pojo.dimission"
+	>
+		select * from dimission where p_id=#{p_id} 
+	</select> 
+	
+	
+	
+		
+	<!-- <insert id="insertTalent" parameterType="com.qut.pojo."></insert> -->
+	<delete id="delEmployee" parameterType="com.qut.pojo.Staff">
+		DELETE FROM emp WHERE p_id=#{p_id}
+	</delete>
+	<insert id="insertTalent" parameterType = "com.qut.pojo.dimission">
+		insert into talent (p_id,p_name,gender,birth,id_card,score,edu,tel)
+			values(#{p_id},#{p_name},#{gender},#{birth},#{id_card},#{score},#{edu},#{tel})	
+	</insert>
+	
+	
+	
+	
+</mapper>
+
+

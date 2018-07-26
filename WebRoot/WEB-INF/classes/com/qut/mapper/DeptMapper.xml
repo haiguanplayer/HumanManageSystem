@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.qut.mapper.DeptMapper">
+<!-- 配置SQL语句，
+ 	 ID表示执行SQL语句的方法名
+     parameterType指定传入参数的类型
+     resultType指定SQL语句的结果集映射成的实体类
+ -->
+	<select id="dept_oneselect_add" parameterType="com.qut.pojo.Dept" resultType="com.qut.pojo.Dept">
+		select dept_name from department where dept_name=#{dept_name}
+	</select>
+	
+	<select id="dept_selectnum" parameterType="com.qut.pojo.Dept" resultType="com.qut.pojo.Staff">
+		select* from emp where dept_name=#{dept_name}
+	</select>
+	
+   <insert id="dept_insert" parameterType="com.qut.pojo.Dept">
+   		insert into department values(null,#{dept_name},#{dept_class},#{dept_phone},#{dept_build_date})
+   </insert>
+   
+   <select id="dept_select" parameterType="com.qut.pojo.Dept" resultType="com.qut.pojo.Dept">
+   		select * from department
+   </select>
+   
+   <select id="dept_oneselect_delete" parameterType="com.qut.pojo.Dept" resultType="com.qut.pojo.Dept">
+   		select d.*,count(e.dept_name) as count from department d,emp e 
+   			where d.dept_id=#{dept_id} and d.dept_name=#{dept_name} and e.dept_name=#{dept_name}
+   </select>
+   
+   <delete id="dept_delete" parameterType="com.qut.pojo.Dept">
+   		DELETE FROM department
+			WHERE dept_id=#{dept_id}
+   </delete>
+  
+   <select id="dept_oneselect_id" parameterType="com.qut.pojo.Dept" resultType="com.qut.pojo.Dept">
+   		select * from department where dept_id=#{dept_id}
+   </select>
+   
+   <select id="dept_oneselect_update" parameterType="com.qut.pojo.Dept" resultType="com.qut.pojo.Dept">
+   		select * from department where dept_id=#{dept_id}
+   </select>
+   
+   <update id="dept_update" parameterType="com.qut.pojo.Dept" >
+   		update department 
+   			set dept_name=#{dept_name},dept_class=#{dept_class},
+   			dept_phone=#{dept_phone},dept_build_date=#{dept_build_date}
+   			where dept_id=#{dept_id} 	
+   </update>
+   
+   
+   
+</mapper>
+
+

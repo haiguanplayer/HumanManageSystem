@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.qut.mapper.ReportMapper">
+
+	<!-- 查询新员工报表 -->
+	<select id="reportNew" parameterType="com.qut.pojo.User" 
+		resultType="com.qut.pojo.Aemo">
+		select dept_name,post_name,p_name,gender,entry_date,edu
+			from emp
+			where entry_date &gt;=#{sdate} and entry_date &lt;=#{edate} 
+ 			<if test="deptname !='null'">
+ 				and dept_name = #{deptname}
+ 			</if>
+	</select>
+	
+	<!-- 查询离职员工报表 -->
+	<select id="reportLeave" parameterType="com.qut.pojo.User"
+		resultType="com.qut.pojo.Bemo" >
+		select dept_name,post_name,p_name,gender,leave_date,leave_class
+			from dimission
+			where leave_date &gt;=#{sdate} and leave_date &lt;=#{edate}
+			<if test="deptname !='null'">
+				and dept_name = #{deptname}
+			</if>
+	</select>		
+	
+	<!-- 查询部门调动员工报表 -->
+	<select id="reportMoveD" parameterType="com.qut.pojo.User"
+		resultType="com.qut.pojo.Cemo" >
+		select before_dept,after_dept,move_dept.p_name,gender,
+			move_dept_date,move_dept_class
+			from move_dept,emp
+			where move_dept_date &gt;=#{sdate} and move_dept_date &lt;=#{edate}
+						and move_dept.p_id = emp.p_id
+	</select>
+	
+	<!-- 查询岗位调动员工报表 -->
+	<select id="reportMoveP" parameterType="com.qut.pojo.User"
+		resultType="com.qut.pojo.Demo" >
+		select dept_name,before_post,after_post,move_post.p_name,gender,
+			move_post_date,move_post_class
+			from move_post,emp
+			where move_post_date &gt;#{sdate} and move_post_date &lt;#{edate}
+					and move_post.p_id = emp.p_id
+	</select>
+	<!-- 人事月表 -->
+	<select id="reportE" parameterType="com.qut.pojo.User" 
+		resultType="com.qut.pojo.Eemo">	
+SELECT aa.dept_name mzero,IFNULL(月初人数,0) mone,IFNULL(月末人数,0) mtwo,IFNULL(新入职人数,0) mthree, 
+	IFNULL(离职人数,0) mfour,IFNULL(本月调入,0) mfive ,IFNULL(本月调出,0) msix,IFNULL(高中,0) msevenmten,
+	IFNULL(大专,0) mnine,IFNULL(本科,0) meight,IFNULL(研究生,0) mseven
+from 
+(
+select dept_name,sum(aaa) 月初人数
+ 	from(
+				SELECT dept_name,count(CASE when entry_date &lt;#{sdate} then 1 else null end) aaa
+				from emp
+				group by dept_name
+				union all 
+				SELECT dept_name,count(CASE when leave_date &gt;#{sdate} and dimission.entry_date &lt;=#{sdate} then 1 else null end) aaa
+				from dimission
+				group by dept_name
+			) a group by dept_name 
+)aa
+LEFT JOIN
+
+(
+	select dept_name,sum(aaa) 月末人数
+ 	from(
+ 		SELECT dept_name,count(CASE when entry_date &lt;last_day(#{edate})	 then 1 else null end) aaa
+		from emp
+		group by dept_name
+ 		union all 
+		SELECT dept_name,count(CASE when leave_date  &gt;=last_day(#{edate}) and dimission.entry_date  &lt;last_day(#{edate}) then 1 else null end) aaa
+		from dimission
+		group by dept_name
+		)as b group by dept_name 
+)bb
+on aa.dept_name = bb.dept_name
+LEFT JOIN
+
+(
+SELECT dept_name,SUM(aaa) 新入职人数 from(
+	SELECT dept_name,count(CASE when entry_date &lt;last_day(#{edate}) and entry_date &gt;=#{sdate} then 1 else null end) aaa
+	from emp
+	group by dept_name
+	union all
+	SELECT dept_name,count(CASE when entry_date &gt;=last_day(#{edate}) and dimission.entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from dimission
+		group by dept_name
+) c group by dept_name
+)cc 
+on aa.dept_name = cc.dept_name
+LEFT JOIN
+
+(
+SELECT dept_name,count(CASE when leave_date  &gt;=#{sdate}	and	leave_date  &lt;last_day(#{edate}) then 1 else null end) 离职人数
+	from dimission
+	GROUP BY dept_name
+)dd
+on bb.dept_name = dd.dept_name
+LEFT JOIN
+
+(
+SELECT after_dept,count(CASE when move_dept_date  &gt;=#{sdate}	and	move_dept_date  &lt;last_day(#{edate}) then 1 else null end) 本月调入
+	from move_dept
+	GROUP BY after_dept
+)ee
+on aa.dept_name = ee.after_dept
+LEFT JOIN
+
+(
+SELECT before_dept,count(CASE when move_dept_date  &gt;=#{sdate}  and move_dept_date &lt;last_day(#{edate}) then 1 else null end) 本月调出
+	from move_dept
+	GROUP BY before_dept
+)ff
+on aa.dept_name = ff.before_dept
+
+LEFT JOIN
+(
+select dept_name,sum(aaa) 高中
+ 	from(
+ 		SELECT dept_name,count(CASE when entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from emp
+		where edu = '高中及以下'
+		group by dept_name
+ 		union all 
+		SELECT dept_name,count(CASE when leave_date &gt;=last_day(#{edate})	and		dimission.entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from dimission
+		where edu = '高中及以下'
+		group by dept_name
+ ) as a group by dept_name 
+)gg
+on bb.dept_name = gg.dept_name
+LEFT JOIN
+
+(
+select dept_name,sum(aaa) 大专
+ 	from(
+ 		SELECT dept_name,count(CASE when entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from emp
+		where edu = '大专'
+		group by dept_name
+ 		union all 
+		SELECT dept_name,count(CASE when leave_date &gt;=last_day(#{edate})	and		dimission.entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from dimission
+		where edu = '大专'
+		group by dept_name
+ ) as a group by dept_name 
+)hh
+on bb.dept_name = hh.dept_name
+LEFT JOIN
+ 
+(
+select dept_name,sum(aaa) 本科
+ 	from(
+ 		SELECT dept_name,count(CASE when entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from emp
+		where edu = '本科'
+		group by dept_name
+ 		union all 
+		SELECT dept_name,count(CASE when leave_date  &gt;=last_day(#{edate})	and		dimission.entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from dimission
+		where edu = '本科'
+		group by dept_name
+ ) as a group by dept_name 
+)ii
+on bb.dept_name = ii.dept_name
+LEFT JOIN
+
+(
+select dept_name,sum(aaa) 研究生
+ 	from(
+ 		SELECT dept_name,count(CASE when entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from emp
+		where edu = '研究生'
+		group by dept_name
+ 		union all 
+		SELECT dept_name,count(CASE when leave_date &gt;=last_day(#{edate})	and		dimission.entry_date &lt;last_day(#{edate}) then 1 else null end) aaa
+		from dimission
+		where edu = '研究生'
+		group by dept_name
+ ) as a group by dept_name 
+)jj
+on bb.dept_name = jj.dept_name
+		
+		</select>
+
+</mapper>
+
+

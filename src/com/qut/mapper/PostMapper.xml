@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.qut.mapper.PostMapper">
+<!-- 使用代理开发时，命名空间必须是包含代理方法的java类路径
+	其实该java类是interface，只声明，具体实现是对应在.xml文件
+	java类名与.xml名一致 -->
+	<!-- 配置sql语句
+	  id表示执行sql语句的方法名，
+	  parameterType指定传入参数的类型,形参个数多余一个使用类对象传入
+	     这两个参数是与session.方法中参数对应的
+	  resultType指定sql语句的结果集映射成的实体类，一般都是列名与类属性名一致。
+	  resultMap指定实体类属性和表中列名一一映射,type属性代表映射后返回值类型
+	 -->
+	 
+	<insert id="insert" parameterType="com.qut.pojo.Post">
+		insert into post VALUES(null,#{post_name},#{post_type},#{post_max})
+	</insert>
+	 
+
+	<select id="findById" parameterType="com.qut.pojo.Post"
+		resultType="com.qut.pojo.Post">
+		select * from post where post_id=#{post_id}
+	</select>
+
+	<delete id="deleteById" parameterType="com.qut.pojo.Post">
+		delete from post where post_id=#{post_id}
+	</delete>
+	
+	 
+	<update id="updateById" parameterType="com.qut.pojo.Post">
+		update post set post_name=#{post_name},post_type=#{post_type},post_max=#{post_max} 
+			where post_id=#{post_id}
+	</update>
+	 
+	 
+	 
+	 <select id="findStaffByPostId" parameterType="com.qut.pojo.Post"
+	 	resultType="com.qut.pojo.Staff">
+	 	select e.*
+		from post p,emp e
+		where p.post_name=e.post_name and p.post_id=#{post_id}
+	 </select>
+	
+	<select id="findAllPost"
+	 	resultType="com.qut.pojo.Post">
+	 	select * from post
+	 </select>
+	
+	
+</mapper>
+
+
